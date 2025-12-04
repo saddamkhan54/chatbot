@@ -1,28 +1,31 @@
-import Bot from "../models/bot.model.js";
-import User from "../models/user.model.js";
+export const Message = async (req, res) => {
+  try {
+    const { text } = req.body;
 
-export const Message=async(req,res)=>{
-   try {
-    const {text}=req.body;
- 
-    if(!text?.trim()){
-        return res.status(400).json({error:"Text cannot be empty"});
+    if (!text?.trim()) {
+      return res.status(400).json({ error: "Text cannot be empty" });
     }
 
-    const user=await User.create({
-        sender:"user",
-        text
-    })
+    const botResponses = {
+      "hello": "Hello! I’m your Blood Donation Assistant. How can I help you today?",
+      "hi": "Hi! Ask me anything about blood donation.",
+      "bye": "Goodbye! Stay healthy and keep saving lives.",
+      "thank you": "You're welcome!",
+      "who are you": "I am a Blood Donation FAQ Chatbot.",
+      "what is your name": "I’m the BloodCare Assistant — your donation guide.",
+      "can we become friend": "Yes",
+      "how are you": "I am fine, what about you?",
 
-    // Data
-    const botResponses={
-  // Basic greetings
-  "hello": "Hello! I’m your Blood Donation Assistant. How can I help you today?",
-  "hi": "Hi! Ask me anything about blood donation.",
-  "bye": "Goodbye! Stay healthy and keep saving lives.",
-  "thank you": "You're welcome! Happy to help.",
-  "who are you": "I am a Blood Donation FAQ Chatbot created to help donors and patients.",
-  "what is your name": "I’m the BloodCare Assistant — your donation guide.",
+      "eligibility": "Eligibility:\n• Age 18–60\n• Weight 50kg+\n• Hemoglobin 12.5+",
+
+      "minimum age to donate": "Minimum age is 18.",
+      "weight for blood donation": "Minimum weight is 50kg.",
+
+      "how often can i donate": "Every 3 months.",
+      "donation gap": "3 months gap required.",
+
+      "universal": "Universal Donor: O−\nUniversal Receiver: AB+",
+"what is your name": "I’m the BloodCare Assistant — your donation guide.",
   "who build you": "I am build by Mr.Saddam khan.",
     "How are you": "I am a fine what's about you",
         "how are you": "I am a fine what's about you",
@@ -100,22 +103,19 @@ export const Message=async(req,res)=>{
   "default": "Sorry, I couldn't understand. Try asking:\n• 'Minimum age to donate'\n• 'Can A+ donate to B+'\n• 'Eligibility for donation'"
 
 
-}
-//input ko lowercase krta ha or extr space htata h
-const normalizedText = text.toLowerCase().trim();
 
-const botResponse = botResponses[normalizedText] || "Sorry, I couldn't understand. Try asking:\n• 'Minimum age to donate'\n• 'Can A+ donate to B+'\n• 'Eligibility for donation";
+    };
 
-const bot = await Bot.create({
-    text: botResponse
-})
+    const normalized = text.toLowerCase().trim();
+    const botMessage = botResponses[normalized] || botResponses["default"];
 
-return res.status(200).json({
-    userMessage:user.text,
-    botMessage:bot.text,
-})
-   } catch (error) {
-    console.log("Error in Message Controller:", error);
-    return res.status(500).json({error:"Internal Server Error"});
-   }
-}
+    return res.status(200).json({
+      userMessage: text,
+      botMessage,
+    });
+
+  } catch (error) {
+    console.log("Error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
